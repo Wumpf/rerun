@@ -329,24 +329,27 @@ fn options_menu_ui(
 
         let hardware_acceleration = &mut app_options.video_decoder_hw_acceleration;
 
+        fn variant_ui(
+            ui: &mut egui::Ui,
+            current_value: &mut DecodeHardwareAcceleration,
+            variant: DecodeHardwareAcceleration,
+        ) -> egui::Response {
+            ui.selectable_value(current_value, variant, format!("{variant}"))
+                .on_hover_text(variant.describe())
+        }
+
         ui.horizontal(|ui| {
             ui.label("Video Decoder:");
             let response = egui::ComboBox::from_id_salt("video_decoder_hw_acceleration")
                 .selected_text(format!("{hardware_acceleration}"))
                 .show_ui(ui, |ui| {
-                    ui.selectable_value(
-                        hardware_acceleration,
-                        DecodeHardwareAcceleration::Auto,
-                        format!("{}", DecodeHardwareAcceleration::Auto),
-                    ) | ui.selectable_value(
-                        hardware_acceleration,
-                        DecodeHardwareAcceleration::PreferSoftware,
-                        format!("{}", DecodeHardwareAcceleration::PreferSoftware),
-                    ) | ui.selectable_value(
-                        hardware_acceleration,
-                        DecodeHardwareAcceleration::PreferHardware,
-                        format!("{}", DecodeHardwareAcceleration::PreferHardware),
-                    )
+                    let mut values = DecodeHardwareAcceleration::VALUES.iter();
+                    let mut response =
+                        variant_ui(ui, hardware_acceleration, *values.next().unwrap());
+                    for variant in values {
+                        response |= variant_ui(ui, hardware_acceleration, *variant);
+                    }
+                    response
                 });
 
             if response.inner.map_or(false, |inner| inner.changed()) {

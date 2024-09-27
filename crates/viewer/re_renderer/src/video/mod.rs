@@ -104,6 +104,26 @@ pub enum DecodeHardwareAcceleration {
     PreferHardware,
 }
 
+impl DecodeHardwareAcceleration {
+    pub const VALUES: &'static [Self] = &[Self::Auto, Self::PreferSoftware, Self::PreferHardware];
+
+    pub fn describe(&self) -> &'static str {
+        match self {
+            Self::Auto => {
+                "May use hardware acceleration if available and compatible with the codec."
+            }
+            Self::PreferSoftware => {
+                "Should use a software decoder even if hardware acceleration is available.
+If no software decoder is present, this may cause decoding to fail."
+            }
+            Self::PreferHardware => {
+                "Should use a hardware decoder.
+If no hardware decoder is present, this may cause decoding to fail."
+            }
+        }
+    }
+}
+
 impl std::fmt::Display for DecodeHardwareAcceleration {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
